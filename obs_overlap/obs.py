@@ -36,27 +36,38 @@ class Obs():
     Real obs will obviously need more attributes than this
     This is just the subset I needed to get my code working
     '''
-    def __init__(self,RA,Dec,ObsTime,ObsCode, Replaces, trkID , pubStatus, desig, Deleted):
-    
+    def __init__(self,RA,Dec,ObsTime,ObsCode, Replaces, pubStatus, desig, Deleted, db):
+
+        # Generate a unique ID (as if from db)
         self.ObsID      = AcceptedObsID.get_next_from_db()
         
+        # Observation-level data
         # Supplied at point of submissions
         self.RA         = RA
         self.Dec        = Dec
         self.ObsTime    = dateutil.parser.isoparse(ObsTime)
         self.ObsCode    = ObsCode
         self.Replaces   = Replaces
-        self.trkID      = trkID
         self.pubStatus  = pubStatus
         self.desig      = desig
         self.Deleted    = Deleted
 
         # Calculated by us as/after we insert
         self.SimilarityGroupID  = None
-        self.Healpix            = None,
+        self.Healpix            = None
+        self.PROCESSING_COMPLETE            = False
+
+        # Allow the parent TrackletID to be stored in the observation
+        #(this will be set by the parent)
+        self.TrackletID = None
+        self.BatchID    = None
+
+        # Store self in db
+        #db.ACCEPTED.append(self)
+        
         
     def __str__(self,):
-        return self.ObsID
+        return str(self.ObsID)
         
     # -------------------------------------------------------------
     # Core Functions: assign observations to groups

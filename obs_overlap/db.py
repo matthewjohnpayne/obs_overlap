@@ -45,10 +45,11 @@ class ITFObsID(DB_ID):
 # -------------------------------------------------------------
 class DB():
     def __init__(self,):
-        self.BATCHES    = []
-        self.TRACKLETS  = []
-        self.ACCEPTED   = []
-        self.OBSGROUPS  = []
-        self.DESIGNATED = []
-        self.ITF        = []
+        self.BATCHES    = {}
+        self.TRACKLETS  = {}
+        self.ACCEPTED   = {}
+        self.OBSGROUPS  = {}
+        self.DESIGNATED = {}
+        self.ITF        = {}
+        self.DELETED    = {}
 

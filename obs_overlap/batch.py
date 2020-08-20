@@ -25,16 +25,24 @@ class Batch():
     individuals. Something like a collection of individual user IDs ?
     
     '''
-    def __init__(self,SubmissionTime, ActorID):
+    def __init__(self,SubmissionTime, ActorID, Tracklets, db):
 
+        # Generate a unique ID (as if from db)
         self.BatchID            = BatchID.get_next_from_db()
 
+        # Batch-level data
         self.SubmissionTime     = dateutil.parser.isoparse(SubmissionTime)
         self.ActorID            = ActorID
         
-        self.tracklets          = {}
-        
-    def associate_tracklet(tracklet):
-        self.tracklets[tracklet.TrackletID] = tracklet
+        # Store contained tracklets in a dictionary structure
+        self.tracklets          = {t.TrackletID : t for t in Tracklets}
 
+        # Tell the contained tracklets (and their observations) ...
+        # ...what their parent BatchID is
+        for TrackletID in self.tracklets:
+            self.tracklets[TrackletID].BatchID = self.BatchID
+            for ObsID in self.tracklets[TrackletID].observations:
+                self.tracklets[TrackletID].observations[ObsID].BatchID = self.BatchID
 
+        # Store self in db
+        db.BATCHES[self.BatchID] = self
