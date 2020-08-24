@@ -206,7 +206,6 @@ class Tracklet():
                 overlap = 0
             # Some overlap with previously known observations
             else :
-                print('else')
                 # Does the observation overlap with anything that is DESIGNATED ?
                 n_designated = len( [so for so in similar_obs if so.ObsID in db.DESIGNATED ] )
                 
