@@ -20,7 +20,7 @@ import numpy as np
 # Local Imports
 # -------------------------------------------------------------
 from db import TrackletID
-#from group_observations import Obs , assign_groupID
+import processing
 
 
 # -------------------------------------------------------------
@@ -55,13 +55,13 @@ class Tracklet():
     # previously submitted tracklets
     # -------------------------------------------------------------
 
-    def tracklet_processing_blackbox(  param_dict , db):
+    def tracklet_processing_blackbox(self,  param_dict , db):
         '''
         For *new* tracklets, I imagine a lengthy process that
         (i) checks whether this is any known designated object
          - this may involve a number of steps, including performing orbit fits
         (ii) checks whether this can be joined with any ITF tracklets
-        (iii)
+        (iii) ...
         
         For tracklets that we are back-filling from the obs-table / flat-files, ...
         I think that we will have to grandfather them in (perhaps only performing
@@ -96,16 +96,16 @@ class Tracklet():
         #     https://drive.google.com/file/d/1QqseCpV7PedW341iKPiv447uVElefs93/view?usp=sharing
         
         if self.overlap_category == 'SINGLES' :
-            deeper.comprehensive_check_and_orbitfit(self)
+            processing.comprehensive_check_and_orbitfit(self)
             
         elif self.overlap_category == 'DESIGNATED' :
             if any_of_the_new_ones_are_primary :
-                deeper.comprehensive_check_and_orbitfit(self)
+                processing.comprehensive_check_and_orbitfit(self)
             else:
                 assign_to_DESIGNATED()
         
         elif self.overlap_category in ['DESIGNATED+SINGLE', 'DESIGNATED+ITF','SINGLE+ITF']:
-            deeper.comprehensive_check_and_orbitfit(self)
+            processing.comprehensive_check_and_orbitfit(self)
 
         elif self.overlap_category == 'ITF' :
             assign_to_ITF()
@@ -115,14 +115,19 @@ class Tracklet():
         
         terminate_processing()
 
-    def assign_to_DESIGNATED(self,):
+    def assign_to_DESIGNATED(self,designation):
         '''
         Tracklet is being assigned to DESIGNATED
         Assumes that previous checks have been done & that
-        the tracklet really belongs their
+        the tracklet really belongs in DESIGNATED
+        
+        NB: Probably need to do something else
+         - e.g. set "desig" flag on consistituent observations
+        
         '''
         for ObsID,obs  in self.observations.items():
             db.DESIGNATED[ObsID] = True
+            self.observations[ObsID].desig = designation
             
     def assign_to_DELETED(self,):
         '''
