@@ -75,14 +75,15 @@ class Tracklet():
         '''
         # (0) May need to do things differently depending on whether we are back-filling
         # from previously-published stuff in the database
-        if param_dict['MODE'] != 'BACKFILL':
-            print('Standard Processing Mode for New Observations')
-        else:
+        if 'MODE' in param_dict and param_dict['MODE'] == 'BACKFILL':
             print('BACKFILL Mode: Lengthy checks will be SUPPRESSED')
+        else:
+            print('Standard Processing Mode for New Observations')
             
         # (1) Categorize the overlap between the constituent observations and
         #     previously known observations
         self.categorize_overlap(db)
+        print(f'self.overlap_category={self.overlap_category}')
         
         # (2) May need to do further logical checks
         #     E.g. What if supplied desig differs from overlap ?
@@ -102,20 +103,20 @@ class Tracklet():
             if any_of_the_new_ones_are_primary :
                 processing.comprehensive_check_and_orbitfit(self)
             else:
-                assign_to_DESIGNATED()
+                self.assign_to_DESIGNATED(db, '???')
         
         elif self.overlap_category in ['DESIGNATED+SINGLE', 'DESIGNATED+ITF','SINGLE+ITF']:
             processing.comprehensive_check_and_orbitfit(self)
 
         elif self.overlap_category == 'ITF' :
-            assign_to_ITF()
+            self.assign_to_ITF(db)
 
         else:
             sys.exit(f'HOW DID WE GET HERE? : Unexpected overlap_category : {overlap_category}')
         
-        terminate_processing()
+        self.terminate_processing(db)
 
-    def assign_to_DESIGNATED(self,designation):
+    def assign_to_DESIGNATED(self,db,designation):
         '''
         Tracklet is being assigned to DESIGNATED
         Assumes that previous checks have been done & that
@@ -129,14 +130,14 @@ class Tracklet():
             db.DESIGNATED[ObsID] = True
             self.observations[ObsID].desig = designation
             
-    def assign_to_DELETED(self,):
+    def assign_to_DELETED(self,db):
         '''
         Perhaps we need a deleted table / status : TBD
         '''
         for ObsID,obs  in self.observations.items():
             db.DELETED[ObsID] = True
             
-    def assign_to_ITF(self,):
+    def assign_to_ITF(self,db):
         '''
         Tracklet is being assigned to the ITF
         Assumes that previous checks have been done & that either ...
@@ -147,7 +148,7 @@ class Tracklet():
         for ObsID,obs  in self.observations.items():
             db.ITF[ObsID] = True
             
-    def terminate_processing(self, ):
+    def terminate_processing(self, db):
         '''
         In real life, some further steps may be required to properly
         populate the db & make other logical checks / calculations
@@ -161,18 +162,28 @@ class Tracklet():
         
             # Here I am checking that each observation gets put into one and only one destination "table"
             # - I.e. it has to be assigned to DESIGNATED, ITF or DELETED
-            in_destinations = [ObsID in db.ITF[ObsID], ObsID in db.DELETED[ObsID], ObsID in db.DESIGNATED[ObsID] ]
-            assert len( [ _ for _ in in_destinations if _ ]) == 1 , f'Incorrect number of destination counts : {in_destinations} '
+            #in_destinations = [ObsID in db.ITF[ObsID], ObsID in db.DELETED[ObsID], ObsID in db.DESIGNATED[ObsID] ]
+            #assert len( [ _ for _ in in_destinations if _ ]) == 1 , f'Incorrect number of destination counts : {in_destinations} '
             
             # Here I am adding a flag to signify processing is complete
             self.observations[ObsID].PROCESSING_COMPLETE = True
             
+            # This does not belong here
+            # I am just putting it here toforce everything into the ITF
+            # This is just temporary
+            # Trying to get the overall code-flow working
+            db.ITF[ObsID] = True
+            
     def categorize_overlap(self, db ):
+        '''
+        Categorization of overlap for entire tracklet
+        This compares the overlap for each of the observations with their respective "similarilty-groups"
+        '''
         
 
         # We will need all observations known to this point
         # ***   Obviously my data structures could be nicer ...    ***
-        # ***   THIS WOULD BE FAR BETTER DONE AS AN SQL QUERY !!!  ***
+        # ***   THIS WOULD BE  BETTER DONE AS AN SQL QUERY !!!  ***
         #
         known_obs = []
         for bID, bb in db.BATCHES.items():
@@ -186,11 +197,12 @@ class Tracklet():
         # I think this needs to be a comparison against a "DESIGNATED" table and an "ITF" table
         overlaps = []
         for o in self.observations.values():
-            # Similarity group
-            similar_obs = [ko for ko in known_obs if ko.SimilarityGroupID==o.SimilarityGroupID]
-            print('similar_obs',o.ObsID, '...',[_.ObsID for _ in similar_obs])
+        
+            # Similarity group (excluding self)
+            similar_obs = [ko for ko in known_obs if ko.SimilarityGroupID==o.SimilarityGroupID and ko.ObsID != o.ObsID ]
+                        
             # No overlap with any other objects : we hope that this is the most common case
-            if len( similar_obs ) == 1 :
+            if len( similar_obs ) == 0 :
                 overlap = 0
             # Some overlap with previously known observations
             else :
@@ -203,7 +215,7 @@ class Tracklet():
 
                 # Does the observation overlap with NEITHER ? [[ HOW IS THIS POSSIBLE ??? ]]
                 n_neither = len( [so for so in similar_obs if so.ObsID not in db.DESIGNATED and so.ObsID not in db.ITF] )
-                assert not n_neither, f'n_neither = {n_neither} which should be impossible'
+                assert not n_neither, f'n_neither = {n_neither} which should be impossible: o.ObsID={o.ObsID}, []={[so.ObsID for so in similar_obs if so.ObsID not in db.DESIGNATED and so.ObsID not in db.ITF]}'
 
                 # Does the observation overlap with BOTH ? [[ HOW IS THIS POSSIBLE ??? : WANT TO DEVEND AGAINST IT IN SUBSEQUENT PROCESSING STEPS ]]
                 n_both = len( [so for so in similar_obs if so.ObsID  in db.DESIGNATED and so.ObsID in db.ITF] )

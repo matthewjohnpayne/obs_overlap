@@ -162,12 +162,8 @@ if __name__ == '__main__':
 
             # Now do the TRACKLET-level processing
             # I.e. This requires that observation-level & observation-group
-            #      quantities be calculated
-            
-            # Establish the degree of tracklet overlap
-            t.categorize_overlap( db )
-            print(f't.overlap_category={t.overlap_category}')
-        
+            #      quantities have been previously calculated
+                    
             # Decide what processing needs to be done on the tracklet.
             # This will depend on the degree of overlap between the
             # observations in the tracklet and the previously-known observations.
