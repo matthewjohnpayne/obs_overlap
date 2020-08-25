@@ -152,12 +152,12 @@ if __name__ == '__main__':
                 print(f'\t\t\t ObsIDs of similar_obs={ [ _.ObsID for _ in similar_obs] }')
 
                 # Select the credit & primary observation from the similarity group
+                # At present am storing in a dict of namedtuples
                 credit_ObsID, primary_ObsID = obs_group.assign_status(similar_obs, db)
-                print(f'\t\t\t credit_ObsID={credit_ObsID} primary_ObsID={primary_ObsID}')
+                db.OBSGROUPS[SimilarityGroupID]= obs_group.ObsGroup(credit_ObsID, primary_ObsID)
+                print(f'\t\t\t db.OBSGROUPS[SimilarityGroupID]={db.OBSGROUPS[SimilarityGroupID]}')
 
-                # At present this credit_ObsID, primary_ObsID is not being used / stored
-                # Could store in a separate object / table
-                # Could store as booleans against the obs
+
 
 
             # Now do the TRACKLET-level processing

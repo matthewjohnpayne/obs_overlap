@@ -8,73 +8,67 @@ We are now moving into the area of down-stream processing,
 orbit-fitting, etc
 
 '''
-
-def comprehensive_check_and_orbitfit(tracklet):
-    return {'PASS':True}
-
-def comprehensive_check_and_orbitfit_WIP(tracklet):
+importt numpy
+def attempt_to_link_multiple_overlap(tracklet):
     '''
-    The highest level functionality I'm willing to consider ...
-    A conceptual end-to-end function that will do *all*
-    necessary orbit-fitting, checking, etc etc etc
+    May want / need to deal with tracklets whose
+    constituent observations overlap multiple designated objects
     
-    As written, I am thinking of it being focussed around the
-    task of deciding whether an incoming tracklet fits with some
-    known object
+    Easiest is just to automatically fail, and subsequently assign
+    the tracklet to UNSELECTABLE
+    '''
+    return {'PASS': False }
+
+def speculative_search(tracklet):
+    '''
+    This is expected to encompass
+    (a) checkID-type approaches
+     - check known orbits against this tracklet
+    (b) pyTrax-type approaches
+     - check ITF tracklets against this tracklet
     
-    Some initial ideas behind this can be found in ...
+    For this developmental / psuedo-code, I will just
+    randomly assign a result
+    '''
+    # (1) Ignore the possibility of checkID matches
+    
+    # (2) Pretend that pyTrax has run, and assign
+    # a random chance of success, and then subsequently,
+    # randomly assign an ITF tracklet
+    result_dict{ 'PASSED':  = True if np.random.random() > 0.5 else False }
+    
+    # (3) Populate other necessary quantities ...
+    if result_dict['PASSED'] :
+        randomObsID = np.random.choice( list(db.ITF.keys()) )
+        TrackletID  = ...
+    return result_dict
+    
+def comprehensive_check_and_orbitfit(tracklet):
+    '''
+
+    
+    Some initial ideas related to this can be found in ...
     https://drive.google.com/file/d/1QqseCpV7PedW341iKPiv447uVElefs93/view?usp=sharing
 
+    Code would need to ...
+    # Collect necessary observations
+    # - From any associated designated / itf / or the tracklet itself
+    # Run the fit
+    # Evaluate the fit
+    # Populate a standard dictionary with results
+    # Update any tracklet attributes as appropriate
+    
+    For this developmental / psuedo-code, I will just
+    randomly assign a result (skewed towards assuming the
+    fit worked)
+    
     '''
-    # Types of tracklet that this routine claims to be competant to process
-    assert tracklet.overlap_category in ['SINGLES','DESIGNATED', 'DESIGNATED+SINGLE', 'DESIGNATED+ITF','SINGLE+ITF', 'ITF']
-    
-    # Do some form of name comprehension similar to "processobs"
-    # N.B. Irrespective of overlap category ['SINGLES' , ... 'SINGLE+ITF', ... or even 'ITF' ]
-    # ... the tracklet may still come with a submitter-supplied designation
-    designation_dict = do_name_comprehension(tracklet)
-    
-    # If we have a designated object to work with, get the previously known observations
-    if tracklet.overlap_category in ['DESIGNATED', 'DESIGNATED+SINGLE', 'DESIGNATED+ITF'] or \
-        designation_dict['PASSED']:
-            designated_obs = get_previously_known_designated_observations(designation_dict)
-    else :
-        designated_obs = []
-        
-    # If we have some overlap with ITF data, get the observations
-    if tracklet.overlap_category in ['DESIGNATED+ITF','SINGLE+ITF'] :
-        itf_tracklets = get_overlapped_itf_tracklets( tracklet )
-    else:
-        itf_tracklets = []
-        
-    # If we have 'SINGLE+ITF', then run speculative search (~checkID)
-    if tracklet.overlap_category == 'SINGLE+ITF':
-        search_evaluation_dict = perform_speculative_search(    [tracklet] ,
-                                                                itf_tracklets )
-        if search_evaluation_dict['PASSED']:
-            designated_tracklets = get_previously_known_designated_observations(search_evaluation_dict)
-        else:
-            tracklet.assign_to_ITF()
-            tracklet.terminate_processing()
-    
-    # If we get this far, then either 'SINGLE+ITF' was success in perform_speculative_search, or
-    # we have any of the other 4 : 'SINGLES','DESIGNATED', 'DESIGNATED+SINGLE', 'DESIGNATED+ITF'
-    #
-    # NB As written, designated_obs and/or itf_obs might be empty at this point
-    # => Might have *only* obs from new tracklet
-    # => perform_and_evaluate_orbit_fit needs to be able to cope with this.
-    #
-    # Run orbit-fitting and evaluation package
-    orbfit_evaluation_dict = perform_and_evaluate_orbit_fit(    [tracklet] ,
-                                                                designated_tracklets,
-                                                                itf_tracklets )
 
-    # If the orbit fit worked ...
-    if orbfit_evaluation_dict['PASSED'] :
-        tracklet.assign_to_DESIGNATED(designation_dict['designation'])
+    # (1) Pretend an orbit fit has run ...
+    result_dict{ 'PASSED': True if np.random.random() > 0.05 else False }
+
+    # (2) Populate other necessary quantities ...
+    if result_dict['PASSED'] :
+        pass
         
-        # If any ITF observations were involved in this successful fit,
-        # then remove from ITF & reassign to DESIGNATED
-        if tracklet.overlap_category in ['SINGLE+ITF', 'DESIGNATED+ITF'] :
-            for itf_tracklet in itf_tracklets:
-                itf_tracklet.assign_to_DESIGNATED(designation_dict['designation'])
+    return result_dict

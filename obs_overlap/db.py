@@ -39,17 +39,19 @@ class DesignatedObsID(DB_ID):
     total = -1
 class ITFObsID(DB_ID):
     total = -1
-
+class UnselectableObsID(DB_ID):
+    total = -1
+    
 # -------------------------------------------------------------
 # This class acts like a set of DB tables
 # -------------------------------------------------------------
 class DB():
     def __init__(self,):
-        self.BATCHES    = {}
-        self.TRACKLETS  = {}
-        self.ACCEPTED   = {}
-        self.OBSGROUPS  = {}
-        self.DESIGNATED = {}
-        self.ITF        = {}
-        self.DELETED    = {}
+        self.BATCHES      = {}
+        self.TRACKLETS    = {}
+        self.ACCEPTED     = {}
+        self.OBSGROUPS    = {}
+        self.DESIGNATED   = {}
+        self.ITF          = {}
+        self.UNSELECTABLE = {}
 

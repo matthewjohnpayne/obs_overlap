@@ -18,9 +18,16 @@ import numpy as np
 # -------------------------------------------------------------
 from db import SimilarityGroupID
 
-# -------------------------------------------------------------
-# Apply labels to a group of similar observations
-# -------------------------------------------------------------
+
+
+
+
+# For whatever reason I have set this ObsGroup stuff up
+# as a namedtuple rather than a class.
+# Not sure there's any ovbvious reason at this point.
+# Perhaps just my continuing uncertainty as to whether
+# there needs to be an ObsGroup table or not.
+ObsGroup = namedtuple('ObsGroup', ['CreditObsID','PrimaryObsID'])
 
 
 
@@ -41,7 +48,66 @@ def check_extant_SimilarityGroupIDs( grouped_observations):
     #    print(_.__dict__)
     extant_SimilarityGroupIDs = [obs.SimilarityGroupID for obs in grouped_observations if obs.SimilarityGroupID is not None]
     return None if extant_SimilarityGroupIDs == [] else extant_SimilarityGroupIDs
+
+# -------------------------------------------------------------
+# Work with pre-defined similarity groups
+# -------------------------------------------------------------
+def fetch_similarity_group(db, SimilarityGroupID):
+    '''
+    select all observations with the same group ID
+     - obviously just a simple db operation
+    '''
+    known_obs = []
+    for bID, bb in db.BATCHES.items():
+        for tID, tt in bb.tracklets.items():
+            known_obs.extend( list(tt.observations.values() ) )
+    return known_obs
+    #return = [ko for ko in db.ACCEPTED.values() if ko.SimilarityGroupID==o.SimilarityGroupID]
+
+def categorize_similarity_group_for_observation(obs):
+    '''
+    
+    returns:
+    --------
+    overlap : integer
+     - integer in [0,1,2]
+     - 0 => *NO* overlap,
+     - 1 => overlaps with observations of *DESIGNATED* object
+     - 2 => overlaps with observations of *ITF* tracklet
+    '''
+    desig = None
+    overlapped_itf_tracklet_ids = []
+    
+    # Similarity group (excluding self)
+    similar_obs = [so for so in obs_group.fetch_similarity_group(db,o.SimilarityGroupID) if ko.ObsID != o.ObsID ]
+                
+    # No overlap with any other objects : we hope that this is the most common case
+    if len( similar_obs ) == 0 :
+        overlap = 0
+    # Some overlap with previously known observations
+    else :
+        # Does the observation overlap with anything that is DESIGNATED ?
+        overlapped_designations = list(set([so.desig for so in similar_obs if so.ObsID in db.DESIGNATED ]))
+        assert len(overlapped_designations) == 1, f'db.DESIGNATED is corrupt (> 1 desig overlapped): {overlapped_designations}'
+                
+        # Does the observation overlap with anything in the ITF ?
+        overlapped_itf_tracklet_ids = list(set([so.TrackletID for so in similar_obs if so.ObsID in db.ITF ]))
+
+        # Does the observation overlap with NEITHER ? [[ HOW IS THIS POSSIBLE ??? : ARE WE PUTTING THINGS INTO ANOTHER TABLE, E.G. DELETED ? ]]
+        n_neither = len( [so for so in similar_obs if so.ObsID not in db.DESIGNATED and so.ObsID not in db.ITF] )
+        assert not n_neither, f'n_neither = {n_neither} which should be impossible: o.ObsID={o.ObsID}, []={[so.ObsID for so in similar_obs if so.ObsID not in db.DESIGNATED and so.ObsID not in db.ITF]}'
+
+        # Does the observation overlap with BOTH ? [[ HOW IS THIS POSSIBLE ??? : WANT TO DEFEND AGAINST IT IN SUBSEQUENT PROCESSING STEPS ]]
+        n_both = len( [so for so in similar_obs if so.ObsID  in db.DESIGNATED and so.ObsID in db.ITF] )
+        assert not n_both, f'n_both = {n_both} which should be impossible'
+
+        # Categorization: 1=>Overlap with designatted, 2=>Overlap with ITS tracklet(s)
+        overlap = 1 if n_designated else 2
         
+    assert overlap in [0,1,2]
+    
+    return overlap, overlapped_designations[0], overlapped_itf_tracklet_ids
+
 # -------------------------------------------------------------
 # Assign "credit" and "selected" status
 # -------------------------------------------------------------
