@@ -11,8 +11,16 @@ As such most/all of the processing functions in this module
 are basically stub-functions / pseudo-code
 
 '''
+# -------------------------------------------------------------
+# Third Party Imports
+# -------------------------------------------------------------
 import numpy as np ; np.random.seed(0)
+from collections import namedtuple
 
+# -------------------------------------------------------------
+# Some named tuples used within Tracklet class
+# -------------------------------------------------------------
+suggested_itf    = namedtuple('suggested_itf',    ['MULTIPLE','TrackletIDList'])
 
 def attempt_to_link_multiple_overlap(tracklet):
     '''
@@ -35,19 +43,34 @@ def speculative_search(tracklet, db):
     For this developmental / psuedo-code, I will just
     randomly assign a result
     '''
+    print(" *** speculative_search *** ")
     # (1) Ignore the possibility of checkID matches
+    #    => Don't bother populating "suggested_desig"
     
     # (2) Pretend that pyTrax has run, and assign
     # a random chance of success, and then subsequently,
     # randomly assign an ITF tracklet
     result_dict = { 'PASSED':  True if np.random.random() > 0.95 and list(db.ITF.keys()) else False }
-    
+
     # (3) Populate other necessary quantities ...
     if result_dict['PASSED'] :
+    
+        # Instead of finding an ITF tracklet with a consistent motion,
+        # just randomly choose one for the sake of development
         randomObsID = np.random.choice( list(db.ITF.keys()) )
-        print(" *** speculative_search *** ")
-        print("Incomplete spec ?!?!")
-        #TrackletID  = ...
+        print('randomObsID=',randomObsID)
+
+        # Find the TrackletID of that selected observation
+        for b in db.BATCHES.values():
+            for t in b.tracklets.values():
+                for o in t.observations.values():
+                    if o.ObsID == randomObsID:
+                        TrackletID = o.TrackletID
+                        break
+        
+        # Populating the suggested_itf namedtuple with a single TrackletID
+        tracklet.suggested_itf = suggested_itf(False, [TrackletID])
+        
     return result_dict
     
 def comprehensive_check_and_orbitfit(tracklet):
@@ -84,8 +107,11 @@ def comprehensive_check_and_orbitfit(tracklet):
         # (2a) Get the deignation out of the supplied structures
         if tracklet.suggested_desig.DESIG is not None :
             result_dict['designation'] = tracklet.suggested_desig.DESIG
-        else:
+        elif tracklet.overlap_desig is not None :
             result_dict['designation'] = tracklet.overlap_desig.DESIGLIST[0]
+        else:
+            # might only have suggest itf ...
+            pass
         
         # (2b) Get the ITF tracklet IDs out of the supplied structures
         # NB
@@ -95,6 +121,6 @@ def comprehensive_check_and_orbitfit(tracklet):
         if tracklet.overlap_itf is not None :
             result_dict['other_TrackletIDs'].extend( tracklet.overlap_itf.TrackletIDList )
         if tracklet.suggested_itf is not None :
-            result_dict['other_TrackletIDs'].extend( tracklet.overlap_itf.TrackletIDList )
+            result_dict['other_TrackletIDs'].extend( tracklet.suggested_itf.TrackletIDList )
 
     return result_dict

@@ -300,6 +300,7 @@ class Tracklet():
             # - if so, there may be some that need to be assigned too
             for other_TrackletID in orbit_fit_dict['other_TrackletIDs']:
                 t = db.TRACKLETS[other_TrackletID]
+                print('other_TrackletID in orbit_fit_dict', )
                 t.assign_to_DESIGNATED(db, orbit_fit_dict['designation'])
         
 
