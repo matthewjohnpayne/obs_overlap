@@ -14,13 +14,14 @@ had their "ObsGroup" status calculated / set
 # Third Party Imports
 # -------------------------------------------------------------
 import sys, os
-import numpy as np
+import numpy as np ; np.random.seed(0)
 from collections import namedtuple
 
 # -------------------------------------------------------------
 # Local Imports
 # -------------------------------------------------------------
 from db import TrackletID
+import obs_group
 import processing
 
 
@@ -68,7 +69,7 @@ class Tracklet():
         self.suggested_itf      = None
 
         # Store self in db
-        #db.TRACKLETS[self.TrackletID] = self
+        db.TRACKLETS[self.TrackletID] = self
     
     def do_name_comprehension(self,):
         '''
@@ -83,14 +84,14 @@ class Tracklet():
         desigs = list(set([o.desig for o in self.observations.values()]))
         assert len(desigs) == 1
         desig = desigs[0]
-        self.suggested_desig = suggested_desig( True if desig[:3] == 'K20' else False, desig )
+        self.suggested_desig = suggested_desig( True if desig is not None and desig[:3] == 'K20' else False, desig )
         return self.suggested_desig
         
     def consistent_designations(self,):
         '''
         Are the designations in overlap_desig & suggested_desig consistent ?
         '''
-        return True if not self.overlap_desig.MULTIPLE and self.overlap_desig.DESIGLIST[0] = self.suggested_desig.DESIG else False
+        return True if not self.overlap_desig.MULTIPLE and self.overlap_desig.DESIGLIST[0] == self.suggested_desig.DESIG else False
                  
 
     def primary_selected_observations_changed():
@@ -108,7 +109,7 @@ class Tracklet():
     # previously submitted tracklets
     # -------------------------------------------------------------
 
-    def tracklet_processing_A____Hints_on_potential_matches(self,  param_dict , db):
+    def tracklet_processing_A____Top_level_process_handler(self,  param_dict , db):
         '''
         Populate tracklet-variables with hints as to the potential designated
         objects and/or tracklets that might be joined with this new tracklet
@@ -116,6 +117,8 @@ class Tracklet():
         Does this using
         (i) Similarity Groups
         (ii) Suggested designations (e.g. from the submitter)
+        
+        Then run the logic to decide how to fit/process tracklet
         '''
         
         # (1) Categorize the overlap between the constituent observations and
@@ -132,16 +135,16 @@ class Tracklet():
         #      the tracklet may still come with a submitter-supplied designation
         # N.B. This populates
         #       self.suggested_desig
-        self.do_name_comprehension(tracklet)
+        self.do_name_comprehension()
         
         # (3) Sketch-out the logical flow of checks/orbit fits that
         #     will need to be done for the various cases
         #     Some initial ideas behind this can be found in ...
         #     https://drive.google.com/file/d/1QqseCpV7PedW341iKPiv447uVElefs93/view?usp=sharing
         #
-        return self.tracklet_processing_B____Decide_if_and_how_to_fit()
+        return self.tracklet_processing_B____Decide_if_and_how_to_fit(db)
         
-    def tracklet_processing_B____Decide_if_and_how_to_fit(db):
+    def tracklet_processing_B____Decide_if_and_how_to_fit(self,db):
         '''
         Torturous logic to decide on what should be done w.r.t.
         orbit-fitting, etc, to allow us to decide what object (if any)
@@ -195,7 +198,7 @@ class Tracklet():
                             if self.primary_selected_observations_changed():
                                 result_dict = {'FINISHED':False } ### Do orbit fit
                             else:
-                                self.assign_to_DESIGNATED(self,db,designation_dict):
+                                self.assign_to_DESIGNATED(db,designation_dict)
                                 result_dict = {'FINISHED':True }
 
                         # If here, then DI or DS => Something new to try with the known designated object
@@ -212,7 +215,7 @@ class Tracklet():
                     #
                     else:
                         self.suggested_desig = suggested_desig(False, self.suggested_desig[1])
-                        self.tracklet_processing_B____Decide_if_and_how_to_fit()
+                        self.tracklet_processing_B____Decide_if_and_how_to_fit(db)
                         
             # If it overlaps multiple designated objects ,
             # I think we might want to label this tracklet as wrong
@@ -227,27 +230,26 @@ class Tracklet():
 
         # If either from S / SI
         elif self.overlap_category.SINGLE :
-        
             # It's going to be very common to have SINGLE + suggested desig
-            if suggested_desig.VALID :
+            if self.suggested_desig.VALID :
                 result_dict = {'FINISHED':False } ### Do orbit fit
                 
             # It's also going to be common to have SINGLE + no-desig (the current 'mbaitf' queue)
             # Also, SINGLE+ITF+no-desig is the standard C51 "extension" approach
             else:
-                
+
                 # Perform speculative "checkID" & "pyTrax" type searches
                 # - Assume *speculative_search()* updates tracklet attributes
-                search_dict = processing.speculative_search(self)
-                if search_dict['PASS']:
+                search_dict = processing.speculative_search(self, db)
+                if search_dict['PASSED']:
                     result_dict = {'FINISHED':False } ### Do orbit fit
                 else:
-                    self.assign_to_ITF(self,db,designation_dict):
+                    self.assign_to_ITF(db)
                     result_dict = {'FINISHED':True }
                         
         # Only I
         elif self.overlap_category.ITF:
-            self.assign_to_ITF(self,db,designation_dict):
+            self.assign_to_ITF(db)
             self.terminate_processing(db)
             result_dict = {'FINISHED':True }
                         
@@ -257,6 +259,11 @@ class Tracklet():
             result_dict = {'FINISHED':True, 'ERROR':True , 'DEBUG':'Incomplete Categorization'}
             
             
+        print('\t'*4,'tracklet_processing_B____Decide_if_and_how_to_fit: after logic, before orbitfit')
+        print('\t'*4,'self.__dict__=...')
+        for k,v in self.__dict__.items():
+            print('\t'*5, k,v)
+            
         # The tortured logic above means that if result_dict['FINISHED'] == True,
         # then the run is finished, while in contrast, result_dict['FINISHED'] == False
         # means that we are not finished and that *** we need to do an orbit-fit ***
@@ -264,15 +271,12 @@ class Tracklet():
         # NB
         # *** *** *** program RETURNS from here if no further work required *** *** ***
         #
-        try :
-            if 'FINISHED' in result_dict and result_dict['FINISHED'] :
-                self.terminate_processing(db)
-                return result_dict
-            else:
-                orbit_fit_dict = processing.comprehensive_check_and_orbitfit(self)
-        except :
+        if 'FINISHED' in result_dict and result_dict['FINISHED'] :
             self.terminate_processing(db)
-            return = {'FINISHED':True, 'ERROR':True , 'DEBUG':'Incomplete Logic: No "result_dict" ??? '}
+            return result_dict
+        else:
+            orbit_fit_dict = processing.comprehensive_check_and_orbitfit(self)
+
 
 
 
@@ -289,6 +293,7 @@ class Tracklet():
                 t = db.TRACKLETS[other_TrackletID]
                 t.assign_to_DESIGNATED(db, orbit_fit_dict['designation'])
         
+
         else:
             if self.overlap_category.SINGLE and not self.overlap_category.DESIGNATED :
             
@@ -300,7 +305,7 @@ class Tracklet():
                 # *** *** ***      recursive function call     *** *** ***
                 #
                 self.suggested_desig = suggested_desig(False, self.suggested_desig[1])
-                self.tracklet_processing_B____Decide_if_and_how_to_fit()
+                self.tracklet_processing_B____Decide_if_and_how_to_fit(db)
                 
             else:
                 
@@ -334,6 +339,7 @@ class Tracklet():
                 
         # Terminate with checks
         self.terminate_processing(db)
+        result_dict = {'FINISHED':True }
         return result_dict
 
     def assign_to_DESIGNATED(self,db,designation):
@@ -433,7 +439,7 @@ class Tracklet():
         # work out if there is some overlap, and if so, what it overlaps with
         overlaps, desigs, itf_tracklets = [],[],[]
         for obs in self.observations.values():
-            o,d,i = obs_group.categorize_similarity_group_for_observation(obs)
+            o,d,i = obs_group.categorize_similarity_group_for_observation(db, obs)
             overlaps.append( o )
             desigs.append( d )
             itf_tracklets.extend( i )
@@ -465,12 +471,12 @@ class Tracklet():
             assert False, 'Should not see this message: poor categorization'
 
         # Store in namedtuple ...
-        assert not SINGLE = DESIGNATED = ITF = False , 'Nothing was set in categorize_overlap() '
+        assert not SINGLE == DESIGNATED == ITF == False , 'Nothing was set in categorize_overlap() '
         self.overlap_category = overlap_category(SINGLE , DESIGNATED , ITF)
         
         # Record any overlap with designated objects
         if DESIGNATED:
-            desigs = list(set(desigs))
+            desigs = list(set([d for d in desigs if d != None]))
             MULTIPLE = True if len(desigs) > 1 else False
             self.overlap_desig = overlap_desig(MULTIPLE , desigs)
             

@@ -3,6 +3,7 @@
 # Third Party Imports
 # -------------------------------------------------------------
 import sys, os
+from collections import Counter
 
 # -------------------------------------------------------------
 # Local Imports
@@ -36,7 +37,7 @@ def gen_input_data(db):
     
 
     yield Batch('2020-04-20T14:32:16.458361' , 'A0' ,
-        [Tracklet([ Obs(20.0,        30.0,       '2020-03-20T14:32:16.458361', '568',   None ,  None ,  None ,    None , db), #0
+        [Tracklet([ Obs(20.0,        30.0,       '2020-03-20T14:32:16.458361', '568',   None ,  None ,  None ,    None , db),#0
                     Obs(20.1,        30.1,       '2020-03-20T15:32:16.458361', '568',   None ,  None ,  None ,    None , db),#1
                     Obs(20.2,        30.2,       '2020-03-20T16:32:16.458361', '568',   None ,  None ,  None ,    None , db),#2
                 ],
@@ -102,7 +103,35 @@ def gen_input_data(db):
         ],
         db)
     
-
+    yield Batch('2020-04-20T21:32:16.458361' , 'A0' ,
+        [Tracklet([ Obs(10.02,       31.0,       '2020-03-20T14:02:16.458361', 'F51',   None ,  None ,  'K20A00B' ,    None , db),#23
+                    Obs(10.12,       31.1,       '2020-03-20T15:02:16.458361', 'F51',   None ,  None ,  'K20A00B' ,    None , db),#24
+                    Obs(10.22,       31.2,       '2020-03-20T16:02:16.458361', 'F51',   None ,  None ,  'K20A00B' ,    None , db),#25
+                    Obs(10.32,       31.3,       '2020-03-20T17:02:16.458361', 'F51',   None ,  None ,  'K20A00B' ,    None , db),#26
+                ],
+                db),
+         Tracklet([ Obs(15.05,       33.2,       '2020-03-20T14:02:16.458361', 'F51',   None ,  None ,  None ,    True , db),#27  *Deleted
+                    Obs(15.15,       33.1,       '2020-03-20T15:02:16.458361', 'F51',   None ,  None ,  None ,    True , db),#28  *Deleted
+                    Obs(15.25,       33.0,       '2020-03-20T16:02:16.458361', 'F51',   None ,  None ,  None ,    True , db),#29  *Deleted
+                ],
+                db)
+        ],
+        db)
+        
+    yield Batch('2020-04-20T22:32:16.458361' , 'A0' ,
+        [Tracklet([ Obs(11.02,       30.0,       '2020-03-20T14:30:16.128361', 'F52',   None ,  None ,  'K20Q05Q' ,    None , db),#30
+                    Obs(11.12,       30.1,       '2020-03-20T15:30:16.128361', 'F52',   None ,  None ,  'K20Q05Q' ,    None , db),#31
+                    Obs(11.22,       30.2,       '2020-03-20T16:30:16.128361', 'F52',   None ,  None ,  'K20Q05Q' ,    None , db),#32
+                    Obs(11.32,       30.3,       '2020-03-20T17:30:16.128361', 'F52',   None ,  None ,  'K20Q05Q' ,    None , db),#33
+                ],
+                db),
+         Tracklet([ Obs(14.45,       35.0,       '2020-03-20T14:30:16.128361', 'F52',   None ,  None ,  'K20C02D' ,    True , db),#34  *Deleted
+                    Obs(14.35,       35.1,       '2020-03-20T15:30:16.128361', 'F52',   None ,  None ,  'K20C02D' ,    True , db),#35  *Deleted
+                    Obs(14.25,       35.2,       '2020-03-20T16:30:16.128361', 'F52',   None ,  None ,  'K20C02D' ,    True , db),#36  *Deleted
+                ],
+                db)
+        ],
+        db)
 # -------------------------------------------------------------
 # Test run
 # -------------------------------------------------------------
@@ -155,7 +184,7 @@ if __name__ == '__main__':
                 # At present am storing in a dict of namedtuples
                 credit_ObsID, primary_ObsID = obs_group.assign_status(similar_obs, db)
                 db.OBSGROUPS[SimilarityGroupID]= obs_group.ObsGroup(credit_ObsID, primary_ObsID)
-                print(f'\t\t\t db.OBSGROUPS[SimilarityGroupID]={db.OBSGROUPS[SimilarityGroupID]}')
+                print(f'\t\t\t s{db.OBSGROUPS[SimilarityGroupID]}')
 
 
 
@@ -167,6 +196,23 @@ if __name__ == '__main__':
             # Decide what processing needs to be done on the tracklet.
             # This will depend on the degree of overlap between the
             # observations in the tracklet and the previously-known observations.
-            t.tracklet_processing_blackbox( {} , db)
-        
-    
+            result_dict = t.tracklet_processing_A____Top_level_process_handler( {} , db)
+            
+            
+    # By this point, all tracklets have been processed
+    # Now summarize the destination "tables"
+    print('\n'*2 , '*** Summary of observation destinations ... *** ')
+    C = Counter()
+    for b in db.BATCHES.values():
+        for t in b.tracklets.values():
+            for o in t.observations.values():
+                C['TOT'] +=1
+                if o.ObsID in db.DESIGNATED:
+                    C['DES'] +=1
+                if o.ObsID in db.ITF:
+                    C['ITF'] +=1
+                if o.ObsID in db.UNSELECTABLE:
+                    C['UNN'] +=1
+    for k,v in C.items():
+        print(k,v)
+    assert C['DES'] + C['ITF'] + C['UNN'] == C['TOT']

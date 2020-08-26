@@ -10,7 +10,7 @@ observations will be assigned "credit" and "selected" status.
 # Third Party Imports
 # -------------------------------------------------------------
 import sys, os
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 import numpy as np
 
 # -------------------------------------------------------------
@@ -61,10 +61,9 @@ def fetch_similarity_group(db, SimilarityGroupID):
     for bID, bb in db.BATCHES.items():
         for tID, tt in bb.tracklets.items():
             known_obs.extend( list(tt.observations.values() ) )
-    return known_obs
-    #return = [ko for ko in db.ACCEPTED.values() if ko.SimilarityGroupID==o.SimilarityGroupID]
+    return [ko for ko in known_obs if ko.SimilarityGroupID==SimilarityGroupID]
 
-def categorize_similarity_group_for_observation(obs):
+def categorize_similarity_group_for_observation(db,obs):
     '''
     
     returns:
@@ -75,12 +74,12 @@ def categorize_similarity_group_for_observation(obs):
      - 1 => overlaps with observations of *DESIGNATED* object
      - 2 => overlaps with observations of *ITF* tracklet
     '''
-    desig = None
+    overlapped_designations = []
     overlapped_itf_tracklet_ids = []
     
     # Similarity group (excluding self)
-    similar_obs = [so for so in obs_group.fetch_similarity_group(db,o.SimilarityGroupID) if ko.ObsID != o.ObsID ]
-                
+    similar_obs = [so for so in fetch_similarity_group(db,obs.SimilarityGroupID) if so.ObsID != obs.ObsID ]
+
     # No overlap with any other objects : we hope that this is the most common case
     if len( similar_obs ) == 0 :
         overlap = 0
@@ -88,25 +87,30 @@ def categorize_similarity_group_for_observation(obs):
     else :
         # Does the observation overlap with anything that is DESIGNATED ?
         overlapped_designations = list(set([so.desig for so in similar_obs if so.ObsID in db.DESIGNATED ]))
-        assert len(overlapped_designations) == 1, f'db.DESIGNATED is corrupt (> 1 desig overlapped): {overlapped_designations}'
-                
+        n_designated = len(overlapped_designations)
+        assert n_designated <= 1, f'db.DESIGNATED is corrupt (> 1 desig overlapped): {overlapped_designations}'
+
         # Does the observation overlap with anything in the ITF ?
         overlapped_itf_tracklet_ids = list(set([so.TrackletID for so in similar_obs if so.ObsID in db.ITF ]))
+        n_itf = len(overlapped_itf_tracklet_ids)
 
-        # Does the observation overlap with NEITHER ? [[ HOW IS THIS POSSIBLE ??? : ARE WE PUTTING THINGS INTO ANOTHER TABLE, E.G. DELETED ? ]]
-        n_neither = len( [so for so in similar_obs if so.ObsID not in db.DESIGNATED and so.ObsID not in db.ITF] )
-        assert not n_neither, f'n_neither = {n_neither} which should be impossible: o.ObsID={o.ObsID}, []={[so.ObsID for so in similar_obs if so.ObsID not in db.DESIGNATED and so.ObsID not in db.ITF]}'
-
-        # Does the observation overlap with BOTH ? [[ HOW IS THIS POSSIBLE ??? : WANT TO DEFEND AGAINST IT IN SUBSEQUENT PROCESSING STEPS ]]
+        # Does the observation overlap with anything that is unselectable ?
+        # Why do this check?
+        # Does the information ever get used ?
+        #overlapped_UNSELECTABLE_tracklet_ids = list(set([so.TrackletID for so in similar_obs if so.ObsID in db.UNSELECTABLE ]))
+        
+        # Does the observation overlap both DESIGNATED & ITF ? [[ SHOULD NOT BE POSSIBLE : WANT TO DEFEND AGAINST IT IN SUBSEQUENT PROCESSING STEPS ]]
         n_both = len( [so for so in similar_obs if so.ObsID  in db.DESIGNATED and so.ObsID in db.ITF] )
         assert not n_both, f'n_both = {n_both} which should be impossible'
 
-        # Categorization: 1=>Overlap with designatted, 2=>Overlap with ITS tracklet(s)
-        overlap = 1 if n_designated else 2
+        # Categorization: 1=>Overlap with designated, 2=>Overlap with ITS tracklet(s)
+        # NB I'm using 0 instead of 3 for if the overlap is only with an unslectable observation.
+        # -- This may need to change
+        overlap = 1 if n_designated else 2 if n_itf else 0
         
     assert overlap in [0,1,2]
     
-    return overlap, overlapped_designations[0], overlapped_itf_tracklet_ids
+    return overlap, None if not overlapped_designations else overlapped_designations[0], overlapped_itf_tracklet_ids
 
 # -------------------------------------------------------------
 # Assign "credit" and "selected" status
@@ -201,11 +205,14 @@ def assign_status( grouped_observations, db ):
 def __compare_obs( selected_Obs, obs):
     '''
     We want / need some ability to compare observations
+    
     Perhaps we could use an approach similar to orbfit:
      - use the observation with the lowest "weighted" uncertainty
+     
+    For the sake of this demo, I will randomly select one of
+    the observations
     '''
-    print(' compare_obs is doing NOTHING !!!!!')
-    return selected_Obs
+    return selected_Obs if np.random.random() > 0.5 else obs 
 
 
 
