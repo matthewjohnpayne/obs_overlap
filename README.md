@@ -6,3 +6,9 @@ obs_overlap
 - If there *are* multiple duplicate / near-duplicate observations, this implies some are already in the database, which implies they will already have assigned ObsGroupIDs which implied that all members of the group should be assigned the lowest extant ObsGroupID (there is a possibility that multiple ObsGroupIDs could be united by the arrival of a new observation that overlaps them both, but which did not themselves previously overlap).
 - It's written using python-style logic, which will doubtless be better executed in a different manner when working on the database tables, but I just find this way of thinking easier...
 -
+
+test / execution
+ - Running the code in the test directory (as below) will process a set of a dozen-or-so tracklets through the developed logic
+ - There are (as yet) no formal tests, merely a print-out to screen demonstrating the fate of the processed tracklets 
+> cd tests
+> python3 test_obs_group_code.py 
