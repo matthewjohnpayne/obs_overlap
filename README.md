@@ -10,5 +10,7 @@ obs_overlap
 test / execution
  - Running the code in the test directory (as below) will process a set of a dozen-or-so tracklets through the developed logic
  - There are (as yet) no formal tests, merely a print-out to screen demonstrating the fate of the processed tracklets 
+
 > cd tests
+
 > python3 test_obs_group_code.py 
