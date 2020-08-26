@@ -37,7 +37,7 @@ def gen_input_data(db):
     
 
     yield Batch('2020-04-20T14:32:16.458361' , 'A0' ,
-        [Tracklet([ Obs(20.0,        30.0,       '2020-03-20T14:32:16.458361', '568',   None  ,    None ,    None , db),#0
+        [Tracklet([ Obs(20.0,        30.0,       '2020-03-20T14:32:16.458361', '568',   None  ,  None ,    None , db),#0
                     Obs(20.1,        30.1,       '2020-03-20T15:32:16.458361', '568',   None  ,  None ,    None , db),#1
                     Obs(20.2,        30.2,       '2020-03-20T16:32:16.458361', '568',   None  ,  None ,    None , db),#2
                 ],
@@ -144,9 +144,9 @@ def gen_input_data(db):
         db)
         
     yield Batch('2020-04-21T01:32:16.458361' , 'A1' ,
-        [Tracklet([ Obs(14.45,       35.0,       '2020-03-20T14:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#41 <=> 34 * Dup
-                    Obs(14.35,       35.1,       '2020-03-20T15:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#42 <=> 35 * Dup
-                    Obs(14.15,       35.3,       '2020-03-20T17:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#43   NEW, so we are extending previous (DS)
+        [Tracklet([ Obs(14.45,       35.0,       '2020-03-20T14:30:16.128361', 'F52',   None  ,  None ,    None , db),#41 <=> 34 * Dup
+                    Obs(14.35,       35.1,       '2020-03-20T15:30:16.128361', 'F52',   None  ,  None ,    None , db),#42 <=> 35 * Dup
+                    Obs(14.15,       35.3,       '2020-03-20T17:30:16.128361', 'F52',   None  ,  None ,    None , db),#43   NEW, so we are extending previous (DS)
                 ],
                 db)
         ],
@@ -159,7 +159,6 @@ if __name__ == '__main__':
     
     # Create a "DB" (just a class)
     db = DB()
-    print(db.BATCHES.items())
 
     # Iterate through the input data
     # - We'll also print a bunch of data to illustrate progress

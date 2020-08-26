@@ -271,17 +271,6 @@ class Tracklet():
             
             
             
-            
-            
-        print('\t'*4,'tracklet_processing_B____Decide_if_and_how_to_fit: after logic, before orbitfit')
-        print('\t'*4,'self.__dict__=...')
-        for k,v in self.__dict__.items():
-            print('\t'*5, k,v)
-            
-            
-            
-            
-            
         # The tortured logic above means that if result_dict['FINISHED'] == True,
         # then the run is finished, while in contrast, result_dict['FINISHED'] == False
         # means that we are not finished and that *** we need to do an orbit-fit ***
@@ -372,7 +361,12 @@ class Tracklet():
          - e.g. set "desig" flag on consistituent observations
         
         '''
-        print('\t'*2, 'assign_to_DESIGNATED\n')
+        print()
+        print('\t'*2, 'assign_to_DESIGNATED')
+        print('\t'*2,'self.__dict__=...')
+        for k,v in self.__dict__.items():
+            print('\t'*3, k,v)
+            
         for ObsID,obs  in self.observations.items():
             # Put it in the DESIGNATED table
             db.DESIGNATED[ObsID] = True
@@ -386,7 +380,12 @@ class Tracklet():
         '''
         Perhaps we need a deleted table / status : TBD
         '''
-        print('\t'*2, 'assign_to_UNSELECTABLE\n')
+        print()
+        print('\t'*2, 'assign_to_UNSELECTABLE')
+        print('\t'*2,'self.__dict__=...')
+        for k,v in self.__dict__.items():
+            print('\t'*3, k,v)
+            
         for ObsID,obs  in self.observations.items():
             db.UNSELECTABLE[ObsID] = True
             # Ensure it's not in the ITF
@@ -406,7 +405,12 @@ class Tracklet():
         (ii) nothing could be done to match the tracklet to anything else
         (iii) ...
         '''
-        print('\t'*2, 'assign_to_ITF\n')
+        print()
+        print('\t'*2, 'assign_to_ITF')
+        print('\t'*2,'self.__dict__=...')
+        for k,v in self.__dict__.items():
+            print('\t'*3, k,v)
+            
         for ObsID,obs  in self.observations.items():
             # Put it in the ITF table
             db.ITF[ObsID] = True
