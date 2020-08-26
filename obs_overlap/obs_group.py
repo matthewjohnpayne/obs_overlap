@@ -96,12 +96,13 @@ class ObsGroup():
     def categorize_similarity_group_wrt_new_observation(self, db, new_obs ):
         '''
         
-        May overlap with single DESIGNATION
-        May overlap with multiple ITF
-        May overlap with multiple UNSELECTABLE
-        May *NOT* overlap with both DESIGNATION and ITF
-        May overlap with both DESIGNATION and UNSELECTABLE
-        May overlap with both ITF and UNSELECTABLE
+        A new observation ...
+         - May overlap with a single DESIGNATION from multiple previous submissions
+         - May overlap with multiple ITF
+         - May overlap with multiple UNSELECTABLE
+         - May *NOT* overlap with both DESIGNATION and ITF
+         - May overlap with both DESIGNATION and UNSELECTABLE
+         - May overlap with both ITF and UNSELECTABLE
         
         if:   self.primary_ObsID==None  : => The entire group is not selectable
         else:
@@ -115,8 +116,7 @@ class ObsGroup():
         
         sets:
         --------
-        self.category : integer
-         - integer in [-1,0,1,2]
+        self.category : integer in [-1,0,1,2]
          -1 => UNSELECTABLE group
           0 => SINGLE (*NO* overlap)
          +1 => overlaps with observations of *DESIGNATED* object
@@ -137,10 +137,12 @@ class ObsGroup():
                 
             # Some overlap with previously known observations
             else :
+            
                 # Does the observation overlap with anything that is DESIGNATED ?
                 overlapped_designations = list(set([so.desig for so in similar_obs if so.ObsID in db.DESIGNATED ]))
                 n_designated = len(overlapped_designations)
                 assert n_designated <= 1, f'db.DESIGNATED is corrupt (> 1 desig overlapped): {overlapped_designations}'
+                
                 if n_designated:
                     self.category   = 1 ### DESIGNATED
                     self.desig      = overlapped_designations[0]
@@ -154,9 +156,10 @@ class ObsGroup():
                     # [[ SHOULD NOT BE POSSIBLE : WANT TO DEFEND AGAINST IT IN SUBSEQUENT PROCESSING STEPS ]]
                     assert not n_designated, f'n_designated={n_designated}, n_itf={n_itf}, which should be impossible '
                     
-                    # If we got here, then ll is fine, assign ITF overlap status
+                    # If we got here, then all is fine, assign ITF overlap status
                     self.category = 2 ### ITF
                 
+                # Check that either n_designated or n_itf has been assigned within this loop
                 assert n_designated or n_itf, 'neither n_itf not n_designated'
     
         assert self.category in [-1,0,1,2], f'self.category NOT in [-1,0,1,2]: {self.category}'
@@ -169,13 +172,13 @@ class ObsGroup():
     def assign_status( self, db ):
         # Assign selected status
         '''
-        For now I assign selected status in the following complicated manner
+        For now I assign status in the following complicated manner
         https://docs.google.com/document/d/1hLUi-E4SOTWOLUEIUpcHVHJVSV4eIGUz5Uyb0OdQ8ok/edit?usp=sharing
 
-        CREDIT
+        CREDIT OBSERVATION
         == Earliest
         
-        PRIMARY
+        PRIMARY OBSERVATION
         Do not select observations as primary that have been explicitly replaced/remeasured by other observations.
         Do not select observations as primary that have been labelled as "deleted", or some similar term.
         Iterate through remaining selectable observations:
@@ -191,7 +194,7 @@ class ObsGroup():
                     The later submission is from a preferred/expert person/source
                     Some kind of manual MPC override
         
-        (NB) Yet more complex criteria may be necessary at a later date
+            (iii) Yet more complex criteria may be necessary at a later date
         
         '''
         # The discovery credit goes to ...
@@ -263,11 +266,12 @@ class ObsGroup():
         Perhaps we could use an approach similar to orbfit:
          - use the observation with the lowest "weighted" uncertainty
          
-        *** *** *** LOGIC NEEDS TO BE DEVELOPED *** *** ***
-        # --------------------------------------------------
+        # -------------------------------------------------------------
+        # *** MICHAEL : MATT P. NEEDS TO FURTHER DEVELOP THIS LOGIC ***
+        #
         # If there existed a "weighted_uncertainty" quantity ...
         # return selected_Obs if selected_Obs.weighted_uncertainty <= obs.weighted_uncertainty else obs
-        # --------------------------------------------------
+        # -------------------------------------------------------------
          
         For the sake of this demo, I will randomly select one of
         the observations
