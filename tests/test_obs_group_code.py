@@ -37,97 +37,97 @@ def gen_input_data(db):
     
 
     yield Batch('2020-04-20T14:32:16.458361' , 'A0' ,
-        [Tracklet([ Obs(20.0,        30.0,       '2020-03-20T14:32:16.458361', '568',   None ,  None ,  None ,    None , db),#0
-                    Obs(20.1,        30.1,       '2020-03-20T15:32:16.458361', '568',   None ,  None ,  None ,    None , db),#1
-                    Obs(20.2,        30.2,       '2020-03-20T16:32:16.458361', '568',   None ,  None ,  None ,    None , db),#2
+        [Tracklet([ Obs(20.0,        30.0,       '2020-03-20T14:32:16.458361', '568',   None  ,    None ,    None , db),#0
+                    Obs(20.1,        30.1,       '2020-03-20T15:32:16.458361', '568',   None  ,  None ,    None , db),#1
+                    Obs(20.2,        30.2,       '2020-03-20T16:32:16.458361', '568',   None  ,  None ,    None , db),#2
                 ],
                 db)
         ],
         db)
         
     yield Batch('2020-04-20T15:32:16.458361' , 'A1' ,
-        [Tracklet([ Obs(10.,         20.,        '2020-03-20T14:32:16.458361', 'F51',   None ,  None ,  None ,    None , db),#3
-                    Obs(11.,         21.,        '2020-03-20T14:32:16.458361', 'F51',   None ,  None ,  None ,    None , db),#4
-                    Obs(12.,         22.,        '2020-03-20T14:32:16.458361', 'F51',   None ,  None ,  None ,    None , db),#5
+        [Tracklet([ Obs(10.,         20.,        '2020-03-20T14:32:16.458361', 'F51',   None  ,  None ,    None , db),#3
+                    Obs(11.,         21.,        '2020-03-20T14:32:16.458361', 'F51',   None  ,  None ,    None , db),#4
+                    Obs(12.,         22.,        '2020-03-20T14:32:16.458361', 'F51',   None  ,  None ,    None , db),#5
                 ],
                 db)
         ],
         db)
         
     yield Batch('2020-04-20T16:32:16.458361' , 'A0' ,
-        [Tracklet([ Obs(20.01,       30.0,       '2020-03-20T14:32:16.458361', '568',   None ,  None ,  None ,    None , db),#6
-                    Obs(20.11,       30.1,       '2020-03-20T15:32:16.458361', '568',   None ,  None ,  None ,    None , db),#7
-                    Obs(20.21,       30.2,       '2020-03-20T16:32:16.458361', '568',   None ,  None ,  None ,    None , db),#8
+        [Tracklet([ Obs(20.01,       30.0,       '2020-03-20T14:32:16.458361', '568',   None  ,  None ,    None , db),#6
+                    Obs(20.11,       30.1,       '2020-03-20T15:32:16.458361', '568',   None  ,  None ,    None , db),#7
+                    Obs(20.21,       30.2,       '2020-03-20T16:32:16.458361', '568',   None  ,  None ,    None , db),#8
                 ],
                 db)
         ],
         db)
         
     yield Batch('2020-04-20T17:32:16.458361' , 'A0' ,
-        [Tracklet([ Obs(20.01,       30.0,       '2020-03-20T14:32:16.458361', '568',   0    ,  None ,  None ,    None , db),#9  <=> #0 (Replaces)
-                    Obs(20.11,       30.1,       '2020-03-20T15:32:16.458361', '568',   1    ,  None ,  None ,    None , db),#10 <=> #1 (Replaces)
-                    Obs(20.21,       30.2,       '2020-03-20T16:32:16.458361', '568',   2    ,  None ,  None ,    None , db),#11 <=> #2 (Replaces)
+        [Tracklet([ Obs(20.01,       30.0,       '2020-03-20T14:32:16.458361', '568',   0    ,  None  ,    None , db),#9  <=> #0 (Replaces)
+                    Obs(20.11,       30.1,       '2020-03-20T15:32:16.458361', '568',   1    ,  None  ,    None , db),#10 <=> #1 (Replaces)
+                    Obs(20.21,       30.2,       '2020-03-20T16:32:16.458361', '568',   2    ,  None  ,    None , db),#11 <=> #2 (Replaces)
                 ],
                 db)
         ],
         db)
         
     yield Batch('2020-04-20T18:32:16.458361' , 'A3' ,
-        [Tracklet([ Obs(40.,         30.,        '2020-03-20T14:32:16.458361', 'T12',   None ,  None ,  None ,    None , db),#12
-                    Obs(50.,         30.,        '2020-03-20T14:32:16.458361', 'T12',   None ,  None ,  None ,    None , db),#13
+        [Tracklet([ Obs(40.,         30.,        '2020-03-20T14:32:16.458361', 'T12',   None  ,  None ,    None , db),#12
+                    Obs(50.,         30.,        '2020-03-20T14:32:16.458361', 'T12',   None  ,  None ,    None , db),#13
                 ],
                 db)
         ],
         db)
         
     yield Batch('2020-04-20T19:32:16.458361' , 'A4' ,
-        [Tracklet([ Obs(40.001,      30.001,     '2020-03-20T14:32:17.458361', '568',   None ,  None ,  None ,    None , db),#14 <=> #12 (Near-Dup)
-                    Obs(50.001,      30.001,     '2020-03-20T14:32:17.458361', '568',   None ,  None ,  None ,    None , db) #15 <=> #13 (Near-Dup)
+        [Tracklet([ Obs(40.001,      30.001,     '2020-03-20T14:32:17.458361', '568',   None  ,  None ,    None , db),#14 <=> #12 (Near-Dup)
+                    Obs(50.001,      30.001,     '2020-03-20T14:32:17.458361', '568',   None  ,  None ,    None , db) #15 <=> #13 (Near-Dup)
                 ],
                 db)
         ],
         db)
         
     yield Batch('2020-04-20T20:32:16.458361' , 'A0' ,
-        [Tracklet([ Obs(20.02,       30.0,       '2020-03-20T14:32:16.458361', '568',   None ,  None ,  None ,    None , db),#16
-                    Obs(20.12,       30.1,       '2020-03-20T15:32:16.458361', '568',   None ,  None ,  None ,    None , db),#17
-                    Obs(20.22,       30.2,       '2020-03-20T16:32:16.458361', '568',   None ,  None ,  None ,    None , db),#18
-                    Obs(20.32,       30.3,       '2020-03-20T17:32:16.458361', '568',   None ,  None ,  None ,    None , db),#19
+        [Tracklet([ Obs(20.02,       30.0,       '2020-03-20T14:32:16.458361', '568',   None  ,  None ,    None , db),#16
+                    Obs(20.12,       30.1,       '2020-03-20T15:32:16.458361', '568',   None  ,  None ,    None , db),#17
+                    Obs(20.22,       30.2,       '2020-03-20T16:32:16.458361', '568',   None  ,  None ,    None , db),#18
+                    Obs(20.32,       30.3,       '2020-03-20T17:32:16.458361', '568',   None  ,  None ,    None , db),#19
                 ],
                 db),
-         Tracklet([ Obs(25.05,       35.0,       '2020-03-20T14:32:16.458361', '568',   None ,  None ,  None ,    True , db),#20  *Deleted
-                    Obs(25.15,       35.1,       '2020-03-20T15:32:16.458361', '568',   None ,  None ,  None ,    True , db),#21  *Deleted
-                    Obs(25.25,       35.2,       '2020-03-20T16:32:16.458361', '568',   None ,  None ,  None ,    True , db),#22  *Deleted
+         Tracklet([ Obs(25.05,       35.0,       '2020-03-20T14:32:16.458361', '568',   None  ,  None ,    True , db),#20  *Deleted
+                    Obs(25.15,       35.1,       '2020-03-20T15:32:16.458361', '568',   None  ,  None ,    True , db),#21  *Deleted
+                    Obs(25.25,       35.2,       '2020-03-20T16:32:16.458361', '568',   None  ,  None ,    True , db),#22  *Deleted
                 ],
                 db)
         ],
         db)
     
     yield Batch('2020-04-20T21:32:16.458361' , 'A0' ,
-        [Tracklet([ Obs(10.02,       31.0,       '2020-03-20T14:02:16.458361', 'F51',   None ,  None ,  'K20A00B' ,    None , db),#23
-                    Obs(10.12,       31.1,       '2020-03-20T15:02:16.458361', 'F51',   None ,  None ,  'K20A00B' ,    None , db),#24
-                    Obs(10.22,       31.2,       '2020-03-20T16:02:16.458361', 'F51',   None ,  None ,  'K20A00B' ,    None , db),#25
-                    Obs(10.32,       31.3,       '2020-03-20T17:02:16.458361', 'F51',   None ,  None ,  'K20A00B' ,    None , db),#26
+        [Tracklet([ Obs(10.02,       31.0,       '2020-03-20T14:02:16.458361', 'F51',   None  ,  'K20A00B' ,    None , db),#23
+                    Obs(10.12,       31.1,       '2020-03-20T15:02:16.458361', 'F51',   None  ,  'K20A00B' ,    None , db),#24
+                    Obs(10.22,       31.2,       '2020-03-20T16:02:16.458361', 'F51',   None  ,  'K20A00B' ,    None , db),#25
+                    Obs(10.32,       31.3,       '2020-03-20T17:02:16.458361', 'F51',   None  ,  'K20A00B' ,    None , db),#26
                 ],
                 db),
-         Tracklet([ Obs(15.05,       33.2,       '2020-03-20T14:02:16.458361', 'F51',   None ,  None ,  None ,    True , db),#27  *Deleted
-                    Obs(15.15,       33.1,       '2020-03-20T15:02:16.458361', 'F51',   None ,  None ,  None ,    True , db),#28  *Deleted
-                    Obs(15.25,       33.0,       '2020-03-20T16:02:16.458361', 'F51',   None ,  None ,  None ,    True , db),#29  *Deleted
+         Tracklet([ Obs(15.05,       33.2,       '2020-03-20T14:02:16.458361', 'F51',   None  ,  None ,    True , db),#27  *Deleted
+                    Obs(15.15,       33.1,       '2020-03-20T15:02:16.458361', 'F51',   None  ,  None ,    True , db),#28  *Deleted
+                    Obs(15.25,       33.0,       '2020-03-20T16:02:16.458361', 'F51',   None  ,  None ,    True , db),#29  *Deleted
                 ],
                 db)
         ],
         db)
         
     yield Batch('2020-04-20T22:32:16.458361' , 'A0' ,
-        [Tracklet([ Obs(11.02,       30.0,       '2020-03-20T14:30:16.128361', 'F52',   None ,  None ,  'K20Q05Q' ,    None , db),#30
-                    Obs(11.12,       30.1,       '2020-03-20T15:30:16.128361', 'F52',   None ,  None ,  'K20Q05Q' ,    None , db),#31
-                    Obs(11.22,       30.2,       '2020-03-20T16:30:16.128361', 'F52',   None ,  None ,  'K20Q05Q' ,    None , db),#32
-                    Obs(11.32,       30.3,       '2020-03-20T17:30:16.128361', 'F52',   None ,  None ,  'K20Q05Q' ,    None , db),#33
+        [Tracklet([ Obs(11.02,       30.0,       '2020-03-20T14:30:16.128361', 'F52',   None  ,  'K20Q05Q' ,    None , db),#30
+                    Obs(11.12,       30.1,       '2020-03-20T15:30:16.128361', 'F52',   None  ,  'K20Q05Q' ,    None , db),#31
+                    Obs(11.22,       30.2,       '2020-03-20T16:30:16.128361', 'F52',   None  ,  'K20Q05Q' ,    None , db),#32
+                    Obs(11.32,       30.3,       '2020-03-20T17:30:16.128361', 'F52',   None  ,  'K20Q05Q' ,    None , db),#33
                 ],
                 db),
-         Tracklet([ Obs(14.45,       35.0,       '2020-03-20T14:30:16.128361', 'F52',   None ,  None ,  'K20C02D' ,    True , db),#34  *Deleted
-                    Obs(14.35,       35.1,       '2020-03-20T15:30:16.128361', 'F52',   None ,  None ,  'K20C02D' ,    True , db),#35  *Deleted
-                    Obs(14.25,       35.2,       '2020-03-20T16:30:16.128361', 'F52',   None ,  None ,  'K20C02D' ,    True , db),#36  *Deleted
+         Tracklet([ Obs(14.45,       35.0,       '2020-03-20T14:30:16.128361', 'F52',   None  ,  'K20C02D' ,    True , db),#34  *Deleted
+                    Obs(14.35,       35.1,       '2020-03-20T15:30:16.128361', 'F52',   None  ,  'K20C02D' ,    True , db),#35  *Deleted
+                    Obs(14.25,       35.2,       '2020-03-20T16:30:16.128361', 'F52',   None  ,  'K20C02D' ,    True , db),#36  *Deleted
                 ],
                 db)
         ],

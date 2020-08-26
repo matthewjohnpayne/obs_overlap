@@ -36,7 +36,7 @@ class Obs():
     Real obs will obviously need more attributes than this
     This is just the subset I needed to get my code working
     '''
-    def __init__(self,RA,Dec,ObsTime,ObsCode, Replaces, pubStatus, desig, Deleted, db):
+    def __init__(self,RA,Dec,ObsTime,ObsCode, Replaces, desig, Deleted, db):
 
         # Generate a unique ID (as if from db)
         self.ObsID      = AcceptedObsID.get_next_from_db()
@@ -48,7 +48,6 @@ class Obs():
         self.ObsTime    = dateutil.parser.isoparse(ObsTime)
         self.ObsCode    = ObsCode
         self.Replaces   = Replaces
-        self.pubStatus  = pubStatus
         self.desig      = desig
         self.Deleted    = Deleted
 
