@@ -45,6 +45,8 @@ def speculative_search(tracklet, db):
     # (3) Populate other necessary quantities ...
     if result_dict['PASSED'] :
         randomObsID = np.random.choice( list(db.ITF.keys()) )
+        print(" *** speculative_search *** ")
+        print("Incomplete spec ?!?!")
         #TrackletID  = ...
     return result_dict
     

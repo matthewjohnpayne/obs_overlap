@@ -378,7 +378,10 @@ class Tracklet():
             
     def assign_to_UNSELECTABLE(self,db):
         '''
-        Perhaps we need a deleted table / status : TBD
+        Tracklet is being assigned to UNSELECTABLE/deleted table
+        Assumes that previous checks have been done & that
+        the tracklet really belongs in UNSELECTABLE
+                
         '''
         print()
         print('\t'*2, 'assign_to_UNSELECTABLE')

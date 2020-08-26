@@ -77,8 +77,8 @@ class Obs():
         
         A wrapper around an updated version of check-near-dups
         
-        I don't think there is any need to iterate: observations that are already in the accepted
-        table will already have SimilarityGroupID
+        No need to iterate: observations that are already in the accepted
+        table will already have an assigned SimilarityGroupID
         
         '''
         
@@ -210,6 +210,8 @@ class Obs():
         '''
         return [obs for obs in shortlist_prev_obs if obs.ObsCode in self.get_ObsCodeList(target_obs) ]
 
+    # This dictionary would become a table of values
+    # in the main database
     arcsecRadius_DICT = {
     'C51' : 10.0,
     'C57' : 20.0,
@@ -218,6 +220,8 @@ class Obs():
         ''' return allowed search-radius [arc-sec] : note that arcsecRadius_DICT is NOT complete'''
         return arcsecRadius if obs.ObsCode not in self.arcsecRadius_DICT else self.arcsecRadius_DICT[obs.ObsCode]
         
+    # This dictionary would become a table of values
+    # in the main database
     timeDeltaSeconds_DICT = {
     '704' : 8
     }
@@ -225,6 +229,8 @@ class Obs():
         ''' return allowed search-radius [time]: note that timeDeltaSeconds_DICT is NOT complete'''
         return timeDeltaSeconds if obs.ObsCode not in self.timeDeltaSeconds_DICT else self.timeDeltaSeconds_DICT[obs.ObsCode]
 
+    # This dictionary would become a table of values
+    # in the main database
     obsCode_DICT = {
         '568' : ['568','T09','T10','T12','T14'],
         'T09' : ['568','T09'],

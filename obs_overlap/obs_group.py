@@ -32,7 +32,9 @@ ObsGroup = namedtuple('ObsGroup', ['CreditObsID','PrimaryObsID'])
 
 class ObsGroup():
     '''
-    
+    Operates on a group of "similar observations" (e.g. near-duplicate observations)
+    Establishes the "credit" & "primary" observation for the group
+    Categorizes the "overlap" nature of the group.
     '''
     def __init__(self, new_obs, db):
     
@@ -111,18 +113,14 @@ class ObsGroup():
                     else
                                         : => Some kind of mistake ?
         
-        
         sets:
         --------
         self.category : integer
          - integer in [-1,0,1,2]
          -1 => UNSELECTABLE group
-          0 => *NO* overlap,
+          0 => SINGLE (*NO* overlap)
          +1 => overlaps with observations of *DESIGNATED* object
          +2 => overlaps with observations of *ITF* tracklet
-         
-         
-         
          
         '''
         
@@ -205,24 +203,24 @@ class ObsGroup():
         
         else:
             credit_ObsID = credit_obs.ObsID
+            
+            # Get the person/group that submitted the batch
             credit_Actor = db.BATCHES[credit_obs.BatchID].ActorID
         
-            # obs that thave explicitly been replaced by some other obs
+            # obs that have explicitly been replaced by some other obs
             replaced_obsIDs = [obs.Replaces for obs in self.observations.values() if obs.Replaces is not None ]
-            # obs that are neither replaced nor deleted
+            # we only consider obs that are neither replaced nor deleted
             selectable_obs  = [ obs for obs in self.observations.values() if obs.ObsID not in replaced_obsIDs and obs.Deleted is not True]
          
 
             # (2) There may be no selectable -primary observations
             if not selectable_obs:
                 primary_ObsID = None
-                
-                
 
             # (3) There may be both credit & primary observations ...
             else:
 
-                # divide obs by submitting_actor
+                # divide obs according to the submitting_actor
                 obs_by_actor = defaultdict(list)
                 for obs in selectable_obs :
                     obs_by_actor[ db.BATCHES[obs.BatchID].ActorID ].append(obs)
@@ -247,9 +245,10 @@ class ObsGroup():
                                 
                 primary_ObsID=primary_Obs.ObsID
 
-
+        # Set as properties of the object
         self.credit_ObsID = credit_ObsID
         self.primary_ObsID= primary_ObsID
+        
         return True
 
 
@@ -263,6 +262,12 @@ class ObsGroup():
         
         Perhaps we could use an approach similar to orbfit:
          - use the observation with the lowest "weighted" uncertainty
+         
+        *** *** *** LOGIC NEEDS TO BE DEVELOPED *** *** ***
+        # --------------------------------------------------
+        # If there existed a "weighted_uncertainty" quantity ...
+        # return selected_Obs if selected_Obs.weighted_uncertainty <= obs.weighted_uncertainty else obs
+        # --------------------------------------------------
          
         For the sake of this demo, I will randomly select one of
         the observations
