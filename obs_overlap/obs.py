@@ -1,7 +1,7 @@
 '''
 MJP 2020_08_14
 
-The classes in "obs" focus on the functions needed to
+The Obs class in "obs.py" focuses on the functions needed to
 work out whether an individual "new" observation is
 similar to any other observations already known.
 
@@ -52,9 +52,9 @@ class Obs():
         self.Deleted    = Deleted
 
         # Calculated by us as/after we insert
-        self.SimilarityGroupID  = None
-        self.Healpix            = None
-        self.PROCESSING_COMPLETE            = False
+        self.SimilarityGroupID      = None
+        self.Healpix                = None
+        self.PROCESSING_COMPLETE    = False
 
         # Allow the parent TrackletID to be stored in the observation
         #(this will be set by the parent)

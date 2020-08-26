@@ -26,7 +26,7 @@ import processing
 
 
 # -------------------------------------------------------------
-# Tracklet Class <==> Accepted Observations Table
+# Some named tuples used within Tracklet class
 # -------------------------------------------------------------
 
 # For labelling overlap from all obs in tracklet: see *categorize_overlap()*
@@ -39,6 +39,10 @@ suggested_desig  = namedtuple('suggested_desig',  ['VALID','DESIG'])
 overlap_itf      = namedtuple('overlap_itf',      ['MULTIPLE','TrackletIDList'])
 # For carrying ITF suggested by (e.g.) pyTrax
 suggested_itf    = namedtuple('suggested_itf',    ['MULTIPLE','TrackletIDList'])
+
+# -------------------------------------------------------------
+# Tracklet Class <==> Accepted Observations Table
+# -------------------------------------------------------------
 
 class Tracklet():
     '''
@@ -118,7 +122,7 @@ class Tracklet():
         (i) Similarity Groups
         (ii) Suggested designations (e.g. from the submitter)
         
-        Then run the logic to decide how to fit/process tracklet
+        Then runs the logic to decide how to fit/process tracklet
         '''
         
         # (1) Categorize the overlap between the constituent observations and
@@ -143,6 +147,7 @@ class Tracklet():
         #     https://drive.google.com/file/d/1QqseCpV7PedW341iKPiv447uVElefs93/view?usp=sharing
         #
         return self.tracklet_processing_B____Decide_if_and_how_to_fit(db)
+        
         
     def tracklet_processing_B____Decide_if_and_how_to_fit(self,db):
         '''
@@ -172,24 +177,29 @@ class Tracklet():
         else:
             pass#print('Standard Processing Mode for New Observations')
         """
-        
-        
+
+        # If tracklet is not selectable, assign as such and quit.
+        if not self.SELECTABLE:
+            self.assign_to_UNSELECTABLE(db)
+            self.terminate_processing(db)
+            result_dict = {'FINISHED':True }
+            return result_dict
+
         # If any from D / DI / DS
-        if self.overlap_category.DESIGNATED :
-        
+        elif self.overlap_category.DESIGNATED :
+
             # If it does NOT overlap multiple designated objects
             if not self.overlap_desig.MULTIPLE:
-                
+
                 # If there was no user-supplied designation,
                 # we can just go ahead and fit using the observations implied by DESIGNATED
-                if not suggested_desig.VALID :
+                if not self.suggested_desig.VALID :
                     result_dict = {'FINISHED':False } ### Do orbit fit
                 else:
-                
                     # Check whether the user-supplied designation is consistent with the
                     # overlapped designation
                     if self.consistent_designations():
-                    
+
                         # If only DESIGNATED (D) (i.e. we've seen everything before),
                         if not self.overlap_category.ITF and not self.overlap_category.SINGLE:
                         
@@ -204,7 +214,7 @@ class Tracklet():
                         # If here, then DI or DS => Something new to try with the known designated object
                         else:
                             result_dict = {'FINISHED':False } ### Do orbit fit
-                            
+
                     # If the user-supplied & overlapped designations are INCONSISTENT
                     # => Probably set suggested desig to VALID=False and just
                     #    search as-if no designation was supplied
@@ -215,15 +225,15 @@ class Tracklet():
                     #
                     else:
                         self.suggested_desig = suggested_desig(False, self.suggested_desig[1])
-                        self.tracklet_processing_B____Decide_if_and_how_to_fit(db)
-                        
+                        return self.tracklet_processing_B____Decide_if_and_how_to_fit(db)
+
             # If it overlaps multiple designated objects ,
             # I think we might want to label this tracklet as wrong
             # (but perhaps try "linking"?)
             else:
                 link_dict = processing.attempt_to_link_multiple_overlap()
                 if link_dict['PASS']:
-                    result_dict = {'FINISHED': False }
+                    result_dict = {'FINISHED': False } ### Do orbit fit
                 else:
                     self.assign_to_UNSELECTABLE(db)
                     result_dict = {'FINISHED': True  }
@@ -255,14 +265,22 @@ class Tracklet():
                         
         # Unknown categorization
         else:
-            print(f'HOW DID WE GET HERE? : Unexpected overlap_category : {overlap_category}')
+            print(f'HOW DID WE GET HERE? : Unexpected overlap_category : {self.overlap_category}')
             result_dict = {'FINISHED':True, 'ERROR':True , 'DEBUG':'Incomplete Categorization'}
+            
+            
+            
+            
             
             
         print('\t'*4,'tracklet_processing_B____Decide_if_and_how_to_fit: after logic, before orbitfit')
         print('\t'*4,'self.__dict__=...')
         for k,v in self.__dict__.items():
             print('\t'*5, k,v)
+            
+            
+            
+            
             
         # The tortured logic above means that if result_dict['FINISHED'] == True,
         # then the run is finished, while in contrast, result_dict['FINISHED'] == False
@@ -276,6 +294,8 @@ class Tracklet():
             return result_dict
         else:
             orbit_fit_dict = processing.comprehensive_check_and_orbitfit(self)
+
+
 
 
 
@@ -299,19 +319,19 @@ class Tracklet():
             
                 # If we got here, then must have previously been ( S or SI ) + suggested_desig.VALID
                 # As that didn't work, let's just force suggested_desig.VALID = False
-                # Then when we rerun it will be forced into the ( S or SI ) + speculative-search route above
+                # Then when we re-run, it will go into the ( S or SI ) + speculative-search route above
                 #
                 # NB
                 # *** *** ***      recursive function call     *** *** ***
                 #
                 self.suggested_desig = suggested_desig(False, self.suggested_desig[1])
-                self.tracklet_processing_B____Decide_if_and_how_to_fit(db)
+                return self.tracklet_processing_B____Decide_if_and_how_to_fit(db)
                 
             else:
                 
                 # If we got here, then the orbit-fit did not work
                 # But recall that
-                # (a) we cannot be just ITF (they don't get orbit-fit)
+                # (a) we cannot be just I (ITF-subset), as they don't get orbit-fit
                 # (b) we cannot be S or SII (they are above)
                 # (c) we must have some overlap (similarity group) with
                 #     observations of previously DESIGNATED objects
@@ -398,8 +418,8 @@ class Tracklet():
         In real life, some further steps may be required to properly
         populate the db & make other logical checks / calculations
         
-        And we might want to change some king of processing flag in the
-        ACCEPTED table to show that processing is complete?
+        And we might want to change some kind of processing flag
+        to show that processing is complete
         
         For this developmental sketch, perhaps nothing much is needed
         '''
@@ -432,46 +452,66 @@ class Tracklet():
          - 'ITF' => ll obs overlap with previously submitted obs that are in the ITF
 
         '''
-        # Default values for namedtuple ...
-        SINGLE = DESIGNATED = ITF = False
+        # Default values ...
+        SELECTABLE = SINGLE = DESIGNATED = ITF = False
 
         # For each observation, use the *categorize_similarity_group_for_observation* function to
         # work out if there is some overlap, and if so, what it overlaps with
         overlaps, desigs, itf_tracklets = [],[],[]
         for obs in self.observations.values():
-            o,d,i = obs_group.categorize_similarity_group_for_observation(db, obs)
-            overlaps.append( o )
-            desigs.append( d )
-            itf_tracklets.extend( i )
+        
+            #print('obs.__dict__', obs.__dict__)
+            #print()
+            #print(obs.SimilarityGroupID)
+            #print()
+            #   print('db.OBSGROUPS', type(db.OBSGROUPS), db.OBSGROUPS.keys())
+        
+            OG = db.OBSGROUPS[obs.SimilarityGroupID]
+            
+            overlaps.append( OG.category )
+            if OG.desig is not None:
+                desigs.append( OG.desig )
+            if OG.TrackletIDs is not None:
+                itf_tracklets.extend( OG.TrackletIDs )
 
         # Categorization of overlap for entire tracklet
         # I find this complicated to think about, so I'm going to try and be very clear in the layout of my logic
-        # (A) Completely disjoint/all-singles: no overlap with known observations
-        if     set(overlaps) == {0} :
-            SINGLE = True
-        # (B) All observations overlap only with designated objects
-        elif   set(overlaps) == {1} :
-            DESIGNATED = True
-        # (C) Some observations overlap with designated objects AND the rest are SINGLE
-        elif   set(overlaps) == {0,1} :
-            DESIGNATED=SINGLE=True
-        # (D) Some observations overlap with designated objects AND some overlap with ITF tracklets
-        #     Not bothered about whether any are single are not.
-        elif   set(overlaps) == {0,1,2}:
-            DESIGNATED=SINGLE=ITF=True
-        elif   set(overlaps) == {1,2}  :
-            DESIGNATED=ITF=True
-        # (E) Some observations overlap with ITF tracklets AND some are SINGLE
-        elif   set(overlaps) == {0,2} :
-            SINGLE=ITF=True
-        # (F) All observations overlap only with ITF tracklets
-        elif   set(overlaps) == {2} :
-            ITF=True
-        else:
-            assert False, 'Should not see this message: poor categorization'
+        #
+        #
+        # (0) Unselectable Tracklet
+        #  - We are not in the business of subdividing tracklets
+        #  - If any of the component observations are unselectable, then so is the entire tracklet
+        if -1 not in overlaps:
+            SELECTABLE = True
+            
+            # (A) Completely disjoint/all-singles: no overlap with known observations
+            if     set(overlaps) == {0} :
+                SINGLE = True
+            # (B) All observations overlap only with designated objects
+            elif   set(overlaps) == {1} :
+                DESIGNATED = True
+            # (C) Some observations overlap with designated objects AND the rest are SINGLE
+            elif   set(overlaps) == {0,1} :
+                DESIGNATED=SINGLE=True
+            # (D) Some observations overlap with designated objects AND some overlap with ITF tracklets
+            #     Not bothered about whether any are single are not.
+            elif   set(overlaps) == {0,1,2}:
+                DESIGNATED=SINGLE=ITF=True
+            elif   set(overlaps) == {1,2}  :
+                DESIGNATED=ITF=True
+            # (E) Some observations overlap with ITF tracklets AND some are SINGLE
+            elif   set(overlaps) == {0,2} :
+                SINGLE=ITF=True
+            # (F) All observations overlap only with ITF tracklets
+            elif   set(overlaps) == {2} :
+                ITF=True
+            else:
+                assert False, 'Should not see this message: poor categorization'
 
-        # Store in namedtuple ...
-        assert not SINGLE == DESIGNATED == ITF == False , 'Nothing was set in categorize_overlap() '
+            assert not (SINGLE == DESIGNATED == ITF == False) , 'Nothing was set in categorize_overlap() '
+
+        # Store overall category data
+        self.SELECTABLE   = SELECTABLE
         self.overlap_category = overlap_category(SINGLE , DESIGNATED , ITF)
         
         # Record any overlap with designated objects

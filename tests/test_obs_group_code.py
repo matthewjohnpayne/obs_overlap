@@ -88,7 +88,7 @@ def gen_input_data(db):
         ],
         db)
         
-    yield Batch('2020-04-20T20:32:16.458361' , 'A0' ,
+    yield Batch('2020-04-20T20:32:16.458361' , 'A4' ,
         [Tracklet([ Obs(20.02,       30.0,       '2020-03-20T14:32:16.458361', '568',   None  ,  None ,    None , db),#16
                     Obs(20.12,       30.1,       '2020-03-20T15:32:16.458361', '568',   None  ,  None ,    None , db),#17
                     Obs(20.22,       30.2,       '2020-03-20T16:32:16.458361', '568',   None  ,  None ,    None , db),#18
@@ -103,11 +103,11 @@ def gen_input_data(db):
         ],
         db)
     
-    yield Batch('2020-04-20T21:32:16.458361' , 'A0' ,
-        [Tracklet([ Obs(10.02,       31.0,       '2020-03-20T14:02:16.458361', 'F51',   None  ,  'K20A00B' ,    None , db),#23
-                    Obs(10.12,       31.1,       '2020-03-20T15:02:16.458361', 'F51',   None  ,  'K20A00B' ,    None , db),#24
-                    Obs(10.22,       31.2,       '2020-03-20T16:02:16.458361', 'F51',   None  ,  'K20A00B' ,    None , db),#25
-                    Obs(10.32,       31.3,       '2020-03-20T17:02:16.458361', 'F51',   None  ,  'K20A00B' ,    None , db),#26
+    yield Batch('2020-04-20T21:32:16.458361' , 'A1' ,
+        [Tracklet([ Obs(10.02,       31.0,       '2020-03-20T14:02:16.458361', 'F51',   None  ,  'K20A00B' ,    None , db),#23 *Suggested Designation
+                    Obs(10.12,       31.1,       '2020-03-20T15:02:16.458361', 'F51',   None  ,  'K20A00B' ,    None , db),#24 *Suggested Designation
+                    Obs(10.22,       31.2,       '2020-03-20T16:02:16.458361', 'F51',   None  ,  'K20A00B' ,    None , db),#25 *Suggested Designation
+                    Obs(10.32,       31.3,       '2020-03-20T17:02:16.458361', 'F51',   None  ,  'K20A00B' ,    None , db),#26 *Suggested Designation
                 ],
                 db),
          Tracklet([ Obs(15.05,       33.2,       '2020-03-20T14:02:16.458361', 'F51',   None  ,  None ,    True , db),#27  *Deleted
@@ -118,16 +118,26 @@ def gen_input_data(db):
         ],
         db)
         
-    yield Batch('2020-04-20T22:32:16.458361' , 'A0' ,
-        [Tracklet([ Obs(11.02,       30.0,       '2020-03-20T14:30:16.128361', 'F52',   None  ,  'K20Q05Q' ,    None , db),#30
-                    Obs(11.12,       30.1,       '2020-03-20T15:30:16.128361', 'F52',   None  ,  'K20Q05Q' ,    None , db),#31
-                    Obs(11.22,       30.2,       '2020-03-20T16:30:16.128361', 'F52',   None  ,  'K20Q05Q' ,    None , db),#32
-                    Obs(11.32,       30.3,       '2020-03-20T17:30:16.128361', 'F52',   None  ,  'K20Q05Q' ,    None , db),#33
+    yield Batch('2020-04-20T22:32:16.458361' , 'A1' ,
+        [Tracklet([ Obs(11.02,       30.0,       '2020-03-20T14:30:16.128361', 'F52',   None  ,  'K20Q05Q' ,    None , db),#30 *Suggested Designation
+                    Obs(11.12,       30.1,       '2020-03-20T15:30:16.128361', 'F52',   None  ,  'K20Q05Q' ,    None , db),#31 *Suggested Designation
+                    Obs(11.22,       30.2,       '2020-03-20T16:30:16.128361', 'F52',   None  ,  'K20Q05Q' ,    None , db),#32 *Suggested Designation
+                    Obs(11.32,       30.3,       '2020-03-20T17:30:16.128361', 'F52',   None  ,  'K20Q05Q' ,    None , db),#33 *Suggested Designation
                 ],
                 db),
-         Tracklet([ Obs(14.45,       35.0,       '2020-03-20T14:30:16.128361', 'F52',   None  ,  'K20C02D' ,    True , db),#34  *Deleted
-                    Obs(14.35,       35.1,       '2020-03-20T15:30:16.128361', 'F52',   None  ,  'K20C02D' ,    True , db),#35  *Deleted
-                    Obs(14.25,       35.2,       '2020-03-20T16:30:16.128361', 'F52',   None  ,  'K20C02D' ,    True , db),#36  *Deleted
+         Tracklet([ Obs(14.45,       35.0,       '2020-03-20T14:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#34  *Deleted
+                    Obs(14.35,       35.1,       '2020-03-20T15:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#35  *Deleted
+                    Obs(14.25,       35.2,       '2020-03-20T16:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#36  *Deleted
+                ],
+                db)
+        ],
+        db)
+        
+    yield Batch('2020-04-20T23:32:16.458361' , 'A1' ,
+        [Tracklet([ Obs(11.020003,   30.0,       '2020-03-20T14:30:16.12836', 'F52',   None  ,  'K20A09A' ,    None , db),#37 <=> 30 *Suggested Designation (wrong) & Near-Dup
+                    Obs(11.120003,   30.1,       '2020-03-20T15:30:16.12836', 'F52',   None  ,  'K20A09A' ,    None , db),#38 <=> 31 *Suggested Designation (wrong) & Near-Dup
+                    Obs(11.220003,   30.2,       '2020-03-20T16:30:16.12836', 'F52',   None  ,  'K20A09A' ,    None , db),#39 <=> 32 *Suggested Designation (wrong) & Near-Dup
+                    Obs(11.320003,   30.3,       '2020-03-20T17:30:16.12836', 'F52',   None  ,  'K20A09A' ,    None , db),#40 <=> 33 *Suggested Designation (wrong) & Near-Dup
                 ],
                 db)
         ],
@@ -156,46 +166,19 @@ if __name__ == '__main__':
             for ObsID,o in t.observations.items():
                 print(f'\t\t ObsID={o.ObsID}')
 
-                # Use the functionality in Obs class to ...
-                #  (i) look for "similar" observations
-                # (ii) create an ObsGroup ...
-                
-                # We will need all observations known to this point
-                # Obviously my data structures could be nicer ...
-                known_obs = []
-                for bID, bb in db.BATCHES.items():
-                    for tID, tt in bb.tracklets.items():
-                        known_obs.extend( list(tt.observations.values() ) )
-                
-                # Work out the similarity group for the new observation
-                similar_obs = o.find_similar( o ,known_obs )
-
-                # Work out the credit & seleted status for the ObsGroup
-                SimilarityGroupID = obs_group.get_SimilarityGroupID(similar_obs)
-                
-                # Take care to assign the SimilarityGroupID to all of the obs in grouped_obs
-                for _ in similar_obs:
-                    db.BATCHES[_.BatchID].tracklets[_.TrackletID].observations[_.ObsID].SimilarityGroupID = SimilarityGroupID
-
-                print(f'\t\t\t SimilarityGroupID={ SimilarityGroupID }')
-                print(f'\t\t\t ObsIDs of similar_obs={ [ _.ObsID for _ in similar_obs] }')
-
-                # Select the credit & primary observation from the similarity group
-                # At present am storing in a dict of namedtuples
-                credit_ObsID, primary_ObsID = obs_group.assign_status(similar_obs, db)
-                db.OBSGROUPS[SimilarityGroupID]= obs_group.ObsGroup(credit_ObsID, primary_ObsID)
-                print(f'\t\t\t s{db.OBSGROUPS[SimilarityGroupID]}')
+                # Set-up an ObsGroup : this will assign SimilarityGroupID, etc
+                OG = obs_group.ObsGroup(o,db)
+                print(f'\t\t\t SimilarityGroupID={ OG.SimilarityGroupID }')
+                print(f'\t\t\t ObsIDs of similar_obs={ [ ObsID for ObsID in OG.observations] }')
+                print(f'\t\t\t credit_ObsID={db.OBSGROUPS[OG.SimilarityGroupID].credit_ObsID}')
+                print(f'\t\t\t primary_ObsID={db.OBSGROUPS[OG.SimilarityGroupID].primary_ObsID}')
 
 
 
 
             # Now do the TRACKLET-level processing
-            # I.e. This requires that observation-level & observation-group
-            #      quantities have been previously calculated
-                    
-            # Decide what processing needs to be done on the tracklet.
-            # This will depend on the degree of overlap between the
-            # observations in the tracklet and the previously-known observations.
+            # NB This requires that observation-level & observation-group
+            #    quantities have been previously calculated
             result_dict = t.tracklet_processing_A____Top_level_process_handler( {} , db)
             
             
@@ -213,6 +196,7 @@ if __name__ == '__main__':
                     C['ITF'] +=1
                 if o.ObsID in db.UNSELECTABLE:
                     C['UNN'] +=1
+
     for k,v in C.items():
         print(k,v)
     assert C['DES'] + C['ITF'] + C['UNN'] == C['TOT']

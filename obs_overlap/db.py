@@ -5,14 +5,14 @@ I was going to code this up in sqlite
 But I decided that would take too much time, and distract
 from the main point of trying to clarify the logic.
 
-So this is just some classes to help me quickly mimic the main attributes
+So this is just some classes to help me quickly mimic the main
+attributes / functionalities of a database structure
 
 '''
 
 # -------------------------------------------------------------
 # Third Party Imports
 # -------------------------------------------------------------
-#import sqlite3
 
 
 # -------------------------------------------------------------
@@ -49,7 +49,7 @@ class DB():
     def __init__(self,):
         self.BATCHES      = {}
         self.TRACKLETS    = {}
-        self.ACCEPTED     = {}
+        self.ACCEPTED     = {}  ### Not currently used
         self.OBSGROUPS    = {}
         self.DESIGNATED   = {}
         self.ITF          = {}
