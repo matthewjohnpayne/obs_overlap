@@ -125,9 +125,9 @@ def gen_input_data(db):
                     Obs(11.32,       30.3,       '2020-03-20T17:30:16.128361', 'F52',   None  ,  'K20Q05Q' ,    None , db),#33 *Suggested Designation
                 ],
                 db),
-         Tracklet([ Obs(14.45,       35.0,       '2020-03-20T14:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#34  *Deleted
-                    Obs(14.35,       35.1,       '2020-03-20T15:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#35  *Deleted
-                    Obs(14.25,       35.2,       '2020-03-20T16:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#36  *Deleted
+         Tracklet([ Obs(14.45,       35.0,       '2020-03-20T14:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#34
+                    Obs(14.35,       35.1,       '2020-03-20T15:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#35
+                    Obs(14.25,       35.2,       '2020-03-20T16:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#36
                 ],
                 db)
         ],
@@ -138,6 +138,15 @@ def gen_input_data(db):
                     Obs(11.120003,   30.1,       '2020-03-20T15:30:16.12836', 'F52',   None  ,  'K20A09A' ,    None , db),#38 <=> 31 *Suggested Designation (wrong) & Near-Dup
                     Obs(11.220003,   30.2,       '2020-03-20T16:30:16.12836', 'F52',   None  ,  'K20A09A' ,    None , db),#39 <=> 32 *Suggested Designation (wrong) & Near-Dup
                     Obs(11.320003,   30.3,       '2020-03-20T17:30:16.12836', 'F52',   None  ,  'K20A09A' ,    None , db),#40 <=> 33 *Suggested Designation (wrong) & Near-Dup
+                ],
+                db)
+        ],
+        db)
+        
+    yield Batch('2020-04-21T01:32:16.458361' , 'A1' ,
+        [Tracklet([ Obs(14.45,       35.0,       '2020-03-20T14:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#41 <=> 34 * Dup
+                    Obs(14.35,       35.1,       '2020-03-20T15:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#42 <=> 35 * Dup
+                    Obs(14.15,       35.3,       '2020-03-20T17:30:16.128361', 'F52',   None  ,  'K20C02D' ,    None , db),#43   NEW, so we are extending previous (DS)
                 ],
                 db)
         ],

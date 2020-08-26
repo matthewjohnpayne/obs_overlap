@@ -372,6 +372,7 @@ class Tracklet():
          - e.g. set "desig" flag on consistituent observations
         
         '''
+        print('\t'*2, 'assign_to_DESIGNATED\n')
         for ObsID,obs  in self.observations.items():
             # Put it in the DESIGNATED table
             db.DESIGNATED[ObsID] = True
@@ -385,6 +386,7 @@ class Tracklet():
         '''
         Perhaps we need a deleted table / status : TBD
         '''
+        print('\t'*2, 'assign_to_UNSELECTABLE\n')
         for ObsID,obs  in self.observations.items():
             db.UNSELECTABLE[ObsID] = True
             # Ensure it's not in the ITF
@@ -404,6 +406,7 @@ class Tracklet():
         (ii) nothing could be done to match the tracklet to anything else
         (iii) ...
         '''
+        print('\t'*2, 'assign_to_ITF\n')
         for ObsID,obs  in self.observations.items():
             # Put it in the ITF table
             db.ITF[ObsID] = True
@@ -525,7 +528,6 @@ class Tracklet():
             itf_tracklets = list(set(itf_tracklets))
             MULTIPLE = True if len(itf_tracklets) > 1 else False
             self.overlap_itf = overlap_itf(MULTIPLE , itf_tracklets)
-
 
         return self.overlap_category, self.overlap_desig, self.overlap_itf
 
